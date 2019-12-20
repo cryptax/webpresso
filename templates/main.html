@@ -1,0 +1,32 @@
+<!doctype html>
+<head>
+  {% block head %}
+  <link rel="stylesheet" href="{{ url_for( 'static', filename='style.css') }}" />
+  <title>Connected Coffee machine</title>
+  {% endblock %}
+</head>
+
+<center>
+  {% block image %}
+<img src="{{ url_for( 'static', filename='nespresso-machine.png') }}" width="30%" />
+<br>
+{% endblock %}
+
+{% block location %}
+This <b>smart coffee machine</b> is located close to <b>Axelle</b>'s desk.
+{% endblock %}
+
+{% block warning %}
+{% if warning %}
+<p class="warning"> {{ warning }} </p>
+{% endif %}
+{% endblock %}
+
+{% block buttons %}
+<br>
+<a href="./ristretto" class="myButton">Ristretto</a>
+<a href="./espresso" class="myButton">Espresso</a>
+<a href="./lungo" class="myButton">Lungo</a>
+{% endblock %}
+
+</center>  
