@@ -41,7 +41,6 @@
 | Machine status         | 0x1920         | 0x3A12                   | 0x001c | You can get notifications. Or read. |
 |                                |                      |                               |             | e.g. 40 02 01 90 00 00 0e f8 |
 |                                |                       |                              | 0x001d | To activate notifications |          
-
 | Machine Specific      | 0x1920          | 0x3A22 		        | 0x001f | When you open the lid: 00. When it is closed: 02 |
 |                                |                       |                              | 0x0020 | To activate notifications |          
 | Schedule brew         | 0x1920 | 0x3A32 | 0x0022 | Read programmed brew. Will be TT TT DD DD DD DD (T=type, F=temperature, D=duration).  If not scheduled 00 00 00 00 00 00  |
@@ -204,6 +203,8 @@ HH xx xx
 
 ### Not on my machine
 
+| Characteristic name | Service UUID | Characteristic UUID |  Comments | 
+| --------------------------- | ----------------- | -------------------------- | --------------- |
 | UiLanguage | 0x19A0 | 0x3A1A | |
 | Country Config | 0x1990 | 0x3A79 | |
 | Get Network Config | 0x1990 | 0x3A29 |
