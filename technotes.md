@@ -50,7 +50,7 @@
 |                                 |             |             |              | To write a recipe, 01 16 08 00 00 .. recipe |
 |                                 |             |             |              | To schedule brew, 03 05 07 04 SS SS SS SS TT TT |
 |                                 |             |             |              | To schedule brew with temperature, 03 05 07 04 SS SS SS SS TT TT FF |
-|                                 |             |             |              | FactoryResetAdapter, payload: 03 07 00 |
+|                                 |             |             |              | payload: 03 07 00 |
 | Response brew         | 0x1920 | 0x3A52 | 0x0026 |   |
 |                                 |             |             |              | c3 05 02 24 12 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
 |                                 |             |             |              | If you try to brew americano: c3 05 02 36 01 80 00 00 00 00 00 00 00 00 00 00 00 00 00 00 |
