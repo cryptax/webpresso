@@ -185,6 +185,12 @@ Normal volumes are (from doc):
 - espresso 40ml
 - lungo 110ml
 
+Acceptable ranges are:
+
+- ristretto: 15-30ml
+- espresso: 30-70ml
+- lungo: 70-130ml
+
 Water hardness and standby:
 
 SS = stand by delay option seconds
@@ -211,3 +217,13 @@ HH xx xx
 | Set Network Config | 0x1990 | 0x3A19 |
 | Query Scan SSID | 0x1990 | 0x3A39 | |
 | Read Scan SSID | 0x1990 | 0x3A49 | |
+
+## Buttons
+
+| Command                                         | Action                                  |
+| ------------------------------------------------ | ------------------------------------- |
+| RISTRETTO + LUNGO 6 sec -> Flash | After filling water tank |
+| LUNGO + ESPRESSO 3 sec                | OFF |
+| SLIDER                                             | ON |
+| Command OFF, then ESPRESSO + LUNGO 5 sec -> Blink | Factory reset |
+| RISTRETTO + ESPRESSO, then remove plug                    | Unpair |

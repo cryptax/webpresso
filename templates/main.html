@@ -13,7 +13,7 @@
 {% endblock %}
 
 {% block location %}
-This <b>smart coffee machine</b> is located close to <b>Axelle</b>'s desk.
+Insomni'hack <b>smart coffee machine</b> demo :)
 {% endblock %}
 
 {% block warning %}
@@ -23,10 +23,30 @@ This <b>smart coffee machine</b> is located close to <b>Axelle</b>'s desk.
 {% endblock %}
 
 {% block buttons %}
+<p>
+<b>Brew a coffee remotely</b>
 <br>
 <a href="./ristretto" class="myButton">Ristretto</a>
 <a href="./espresso" class="myButton">Espresso</a>
 <a href="./lungo" class="myButton">Lungo</a>
+</p>
+{% endblock %}
+
+{% block volume %}
+<p>
+<br>
+<b>Modify volume (in ml) for a given cup</b><br>
+<form action="./volume" method="get">
+
+  <input type="radio" name="cuptype" value="0">Ristretto (default: 25 ml, acceptable range: 15-30 ml)<br>
+  <input type="radio" name="cuptype" value="1">Espresso (default: 40 ml, acceptable range: 30-70 ml)<br>
+  <input type="radio" name="cuptype" value="2" checked>Lungo (default: 110 ml, , acceptable range: 70-130 ml)<br>
+  <br>
+  Volume in ml: <input type="text" name="volume"><br>
+  <br>
+  <input type="submit" value="Modify Cup Size" class="myButton">
+</form>
+</p>
 {% endblock %}
 
 </center>  

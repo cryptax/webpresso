@@ -4,14 +4,16 @@
 
 #log_user 0
 
-send_user "========= Brew =========\n"
+send_user "========= Customize Volume =========\n"
 send_user "              by @cryptax\n"
-send_user "\nMake sure lid has been opened to insert coffee and closed\n\n"
 
-# first argument: 0 (ristretto), 1 (espresso), 2 (lungo)
+# first argument: cup size to modify 0 (ristretto), 1 (espresso), 2 (lungo)
+# second argument: xx where xx is volume in mL in hex
 
 set cuptype [lindex $argv 0];
-send_user "Asking to brew cuptype=$cuptype"
+set cupvolume [lindex $argv 1];
+send_user "Asking to customize cuptype=$cuptype with  cupvolume=$cupvolume"
+
 set prompt "#"
 set address "D2:A7:4C:76:F3:E0"
 set timeout 2
@@ -64,49 +66,48 @@ expect {
     "Attempting to write"
 }
 
-# Brew !
-send "select-attribute /org/bluez/hci0/dev_D2_A7_4C_76_F3_E0/service001a/char0023\r"
+# Modify cup size
+send_user "Selecting cup...\n"
+send "select-attribute /org/bluez/hci0/dev_D2_A7_4C_76_F3_E0/service002e/char002f\r"
 expect {
-    timeout { send_user "Failed to select brewing characteristic\n"; exit 7 }
+    timeout { send_user "Failed to select Lungo cup characteristic\n"; exit 7 }
     $prompt
 }
-
-set timeout 2
-send_user "Brew coffee now! cuptype=$cuptype \n"
-send "write \"0x03 0x05 0x07 0x04 0x00 0x00 0x00 0x00 0x00 0x0$cuptype \"\r"
+send "write \"0x00 0x0$cuptype\"\r"
 expect {
-    timeout { send_user "Failed to brew\n"; exit 8 }
-    "Attempting to write"
-}
-
-# check response
-send_user "Check coffee maker response: \n"
-send "select-attribute /org/bluez/hci0/dev_D2_A7_4C_76_F3_E0/service001a/char0025\r"
-expect {
-    timeout { send_user "Failed to select response characteristic\n"; exit 9 }
+    timeout { send_user "Failed to write Lungo cup characteristic\n"; exit 8 }
     $prompt
 }
-
-sleep 2
-set timeout 5
 send "read\r"
 expect {
-    timeout { send_user "Failed to read response characteristic\n"; exit 10 }
-    "c3 05 02 36 01" { send_user "This coffee machine does not support Americano\n"; exit 11 }
-    "c3 05 02 24 08" { send_user "The slider is open\n"; exit 12 }
-    "c3 05 02 24 12" { send_user "You haven't inserted any coffee capsule\n"; exit 13}
-    "c3 05 03 24 01" { send_user "Please fill the water tank\n"; exit 14 }
-    "83 05" { send_user "Success, enjoy your coffee\n" }
-    "83 06" { send_user "Operation canceled.\n"; exit 15 }
+    timeout { send_user "Failed to read back Lungo cup characteristic\n"; exit 9 }
+    string tolower "00 0$cuptype"
 }
 
+send_user "Setting volume...\n"
+send "select-attribute /org/bluez/hci0/dev_D2_A7_4C_76_F3_E0/service002e/char0031\r"
+expect {
+    timeout { send_user "Failed to select volume characteristic\n"; exit 10 }
+    $prompt
+}
+send "write \"0x00 0x$cupvolume 0xff 0xff\"\r"
+expect {
+    timeout { send_user "Failed to write volume characteristic\n"; exit 11 }
+    $prompt
+}
+#send "read\r"
+#expect {
+#    timeout { send_user "Failed to read back volume characteristic\r"; exit 12 }
+#    string tolower "00 $cupvolume ff ff"
+#}
 
+send_user "Cup volume modified with success\n"
 send "back\r"
 send "disconnect\r"
 send "quit\r"
 expect eof
 send_user "Bye!\n"
-
+exit 0
 
 
 
