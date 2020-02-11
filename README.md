@@ -1,34 +1,33 @@
 # Smart coffee machine on local network
 
-[Prodigio smart coffee machines](https://www.nespresso.com/fr/fr/prodigio-machines-range) are only accessible through BLE.
-This project makes it possible to access it via HTTP/HTTPS, using a RPi 3 as BLE relay.
+[Prodigio smart coffee machines](https://www.nespresso.com/fr/fr/prodigio-machines-range) are only accessible through **Bluetooth Low Energy (BLE)**.
+This project makes it possible to access them via HTTP/HTTPS, using a RPi 3 as BLE relay.
+
+Additionally, this project allows to **customize the volume of cups**, a feature which is not currently available through the smartphone app.
 
 *This is a research project, as always, use at your own risk.*
 
-- `brew.sh`: Expect script to communicate with the coffee machine
-- `ph0wn-hack.sh`: hack to prepare a 70mL coffee
-- `ph0wn-reset.sh`: reset Lungo cup size to the normal value.
-- `ph0wn-lungo.sh`: prepare a Lungo
-- `webpresso.py`: main Flask app
-- `technotes.md`: tech notes on the coffee machine.
+## Webpresso
 
-## Scripts
+The idea is to use a **RPi 3 (or +) to handle all BLE communications**.
+You **no longer pair your smartphone with the coffee machine**.
 
-- Install **Bluez 5.50+**. Note that I encountered several errors / disconnect issues with older versions.
-- `sudo apt-get install expect`
-- Plug the smart coffee machine within BLE range
-- **Get your own authorization code and patch the script:
+On the RPi 3,
+
+- [Install Raspbian](https://www.raspberrypi.org/downloads/raspbian/)
+- `sudo apt-get install python3-pip bluez expect`
+- Install **Flask** and **Gunicorn** (better: do it a virtual environment using `venv`): `pip3 install flask gunicorn`
+- **Get your own authorization code** (see section below) and patch `brew.sh` and `custom-volume.sh`:
 
 ```
 send_user "Sending authorization code..."
 send "char-write-req 0x0014 YOUR-CODE-HERE\r"
 ```
 
-- Ensure no other device is paired with the smart coffee machine
-- Insert a capsule
-- Launch a script, for example `ph0wn-lungo.sh` will prepare a Lungo for  you.
+- Launch Flask: `gunicorn --bind 0.0.0.0:8000 webpresso:app`
+- Connect to `http://your-host:port`
 
-### Getting the authorization code
+## Getting the authorization code
 
 To get your authorization code, I suggest:
 
@@ -39,22 +38,16 @@ To get your authorization code, I suggest:
 5. Collect the Bluetooth traces and view them with Wireshark for instance
 6. Locate an ATT Write Request on handle 0x0014. Its value contains the authorization code.
 
+## Troubleshooting
 
-
-## Web interface for the coffee machine
-
-This is a small web interface to the coffee machine. The idea is to pilot the coffee machine via HTTP/HTTPS, so that people with access to this web interface may brew coffee.
-The host that hosts the web interface acts the unique BLE client to the smart coffee machine, and therefore *expands* BLE range to Web/Wifi range.
-Typically, the host is intended to be a Raspberry Pi 3 (or +). It can be any host which supports BLE, python and Flask.
-
-On the host which runs this web interface:
-
-1. Ensure the scripts work
-2. Then deploy the web interface
-3. Ensure the host is available on your Intranet or wherever you want the functionality (probably **not** on Internet!).
-
-
-Be sure to activate the flask venv:
+- If you get BLE errors (disconnects, or any strange error), install **bluez 5.50+**. I encountered many errors with older versions, they solved with 5.50.
+- Make sure your coffee machine is within BLE range
+- Power on your coffee machine by opening/closing the slider
+- Ensure the slider is closed
+- Ensure **no other device is paired with the coffee machine**
+- If you manage to connect and pair to the coffee machine but are unable to brew a coffee, it's likely that your authorization code is incorrect. Check it again: it changes when the coffee machine is reset.
+- Try to brew coffee using the scripts rather that the web interface to rule out Flask issues
+- Use the development version of Flask, instead of deploying with gunicorn.
 
 ```
 export FLASK_ENV=development
@@ -62,8 +55,36 @@ export FLASK_APP=webpresso.py
 python3 -m flask run
 ```
 
-To deploy:
 
-- In the flask venv: `pip3 install gunicorn `
-- Then, `./venv/bin/gunicorn --bind 0.0.0.0:8000 webpresso:app`
+## Scripts
+
+- `brew.sh`: Expect script to communicate with the coffee machine and brew coffee. This script expects one argument: 0 for ristretto, 1 for espresso and 2 for Lungo.
+
+```
+./brew.sh 0
+```
+
+It is possible to comment out `bluetoothctl` output by uncommenting this line of `brew.sh`:
+
+```
+#log_user 0
+```
+
+- `custom-volume.sh`: Expect script to customized the volume of cups. This script expects 2 arguments: the first one is the cup to customize (0 for ristretto, 1 for espresso and 2 for Lungo). The second argument should be the hexadecimal value of the volume in ml.
+
+```
+./custom-volume 2 6e
+```
+
+- `webpresso.py`: main Flask app
+
+The other scripts are solutions to Ph0wn CTF challenge:
+
+- `ph0wn-hack.sh`: hack to prepare a 70mL coffee
+- `ph0wn-reset.sh`: reset Lungo cup size to the normal value.
+- `ph0wn-lungo.sh`: prepare a Lungo
+
+## Documentation
+
+- `technotes.md`: tech notes on the coffee machine.
 
